@@ -11,19 +11,48 @@
         overflow: auto;
         max-width: 300px;
     }
+
+    .form-control {
+        margin-bottom: 15px;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        font-size: 14px;
+        color: #333;
+    }
+
+    ::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+        color: #d3d3d3;
+        opacity: 1; /* Firefox */
+        font-size: 14px;
+        font-style: italic;
+    }
+
+    :-ms-input-placeholder { /* Internet Explorer 10-11 */
+        color: #d3d3d3;
+        font-size: 14px;
+        font-style: italic;
+    }
+
+    ::-ms-input-placeholder { /* Microsoft Edge */
+        color: #d3d3d3;
+        font-size: 14px;
+        font-style: italic;
+    }
 </style>
 <body>
     <div class="container">
-        <h1 class="text-center my-4">补全专用网页</h1>
+        <h1 class="text-center my-4">地图信息补全</h1>
         <div class="form-group mb-3">
             <label for="map_name">地图名称</label>
-            <input class="form-control mb-1" placeholder="地图名称" id="map_name"/>
+            <input class="form-control mb-1" placeholder="e.g. 北极熊" id="map_name"/>
+            <label for="map_version">地图版本</label>
+            <input class="form-control mb-1" placeholder="e.g. 1.16.5" id="map_version"/>
             <label for="map_url">地图链接</label>
-            <input class="form-control mb-1" placeholder="地图链接" id="map_url"/>
+            <input class="form-control mb-1" placeholder="e.g. https://example.com" id="map_url"/>
             <label for="url_code">提取码</label>
-            <input class="form-control mb-1" placeholder="提取码" id="url_code"/>
+            <input class="form-control mb-1" placeholder="e.g. ZICB" id="url_code"/>
             <label for="map_category">类型</label>
-            <input class="form-control mb-1" placeholder="类型" id="map_category">
+            <input class="form-control mb-1" placeholder="e.g. 冒险" id="map_category">
         </div>
         <div class="d-flex justify-content-center mb-5">
             <button class="btn btn-danger mx-3" onclick="clearInputs()">清空输入框</button>
@@ -86,7 +115,7 @@
             table.className = 'table table-striped table-bordered table-hover table-responsive-md';
 
             const thead = document.createElement('thead');
-            const headers = ['地图名称', '地图链接', '提取码', '类型', '操作'];
+            const headers = ['序号', '地图名称', '地图链接', '提取码', '类型', '操作']; // 添加序号列
             const headerRow = document.createElement('tr');
             headers.forEach(header => {
                 const th = document.createElement('th');
@@ -107,6 +136,11 @@
 
         function createRow(info, index) {
             const row = document.createElement('tr');
+
+            // 添加序号列
+            const indexCell = document.createElement('td');
+            indexCell.textContent = index + 1; // 序号从1开始
+            row.appendChild(indexCell);
 
             for (let key in info) {
                 const cell = document.createElement('td');
