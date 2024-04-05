@@ -8,16 +8,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $old_map_info = [];
 
-    // 检查 map_info.json 文件是否存在
-    if (file_exists('map_info.json')) {
-        // 如果文件存在，检查文件是否为空
-        if (filesize('map_info.json') > 0) {
-            // 如果文件不为空，读取文件中的旧数据
-            $old_map_info = json_decode(file_get_contents('map_info.json'), true);
-        }
-    } else {
+    // 设置文件路径
+    $file_path = './storage/map_info.json';
+
+    // 检查文件夹是否存在
+    if (!is_dir(dirname($file_path))) {
+        // 如果文件夹不存在，创建文件夹
+        mkdir(dirname($file_path), 0777, true);
+    }
+
+    // 检查文件是否存在
+    if (!file_exists($file_path)) {
         // 如果文件不存在，创建一个新的空文件
-        file_put_contents('map_info.json', '');
+        file_put_contents($file_path, '');
+    } else {
+        // 如果文件存在，检查文件是否为空
+        if (filesize($file_path) > 0) {
+            // 如果文件不为空，读取文件中的旧数据
+            $old_map_info = json_decode(file_get_contents($file_path), true);
+        }
     }
 
     // 检查新提交的数据中的 map_name 是否在旧数据中
@@ -36,7 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // 将 old_map_info 写入文件
-    file_put_contents('map_info.json', json_encode($old_map_info, JSON_UNESCAPED_UNICODE));
+    file_put_contents($file_path, json_encode($old_map_info, JSON_UNESCAPED_UNICODE));
 
     echo json_encode(['message' => 'Success']);
     http_response_code(200);
