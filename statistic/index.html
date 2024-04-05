@@ -5,30 +5,88 @@
     <title>已上传统计</title>
     <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/4.6.2/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
+    <script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/4.6.2/js/bootstrap.min.js"></script>
 </head>
 <body>
+<div id="message-container" class="fixed-top m-3"
+     style="left: auto; right: 0;top: 0; width: 300px; z-index: 9999;"></div>
 <div class="container mt-5">
-    <div class="card">
+    <!-- 文件信息卡片 -->
+    <div class="card mb-3">
         <div class="card-header">
-            JSON 文件信息
+            文件信息
         </div>
         <ul class="list-group list-group-flush">
             <li class="list-group-item">文件名: <span id="fileName"></span></li>
             <li class="list-group-item">文件大小: <span id="fileSize"></span></li>
-            <li class="list-group-item">项数: <span id="itemCount"></span></li>
+            <li class="list-group-item">文件更新时间: <span id="fileUpdateTime"></span></li>
+        </ul>
+    </div>
+    <!-- 内容项数卡片 -->
+    <div class="card">
+        <div class="card-header">
+            内容信息
+        </div>
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item">上传地图数目: <span id="itemCount"></span></li>
+            <li class="list-group-item">单人地图数目: <span id="singleMapCount"></span></li>
+            <li class="list-group-item">多人地图数目: <span id="multiMapCount"></span></li>
+            <li class="list-group-item">单/多人地图数目: <span id="singleandmultiMapCount"></span></li>
         </ul>
     </div>
 </div>
-
-<script src="https://cdn.bootcdn.net/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<div class="d-flex justify-content-center mt-5">
+    <button id="refreshButton" class="btn btn-primary">刷新数据</button>
+</div>
 <script>
-    $(document).ready(function () {
+    $('#refreshButton').click(function () {
+        updateData();
+    });
+
+    function updateData() {
         $.get('main.php', function (data) {
             $('#fileName').text(data.file_name);
-            $('#fileSize').text(data.file_size + ' bytes');
+            $('#fileSize').text(data.file_size);
             $('#itemCount').text(data.item_count);
+            $('#singleMapCount').text(data.single_map_count);
+            $('#multiMapCount').text(data.multi_map_count);
+            $('#singleandmultiMapCount').text(data.single_multi_map_count);
+            $('#fileUpdateTime').text(data.file_update_time);
+
+            // 显示消息
+            showMessage('刷新成功', 'success');
         }, 'json');
-    });
+    }
+
+    function showMessage(message, type) {
+        const messageContainer = document.getElementById('message-container');
+        const alert = document.createElement('div');
+        alert.className = `alert alert-${type} alert-dismissible fade`;
+        alert.textContent = message;
+
+        const closeButton = document.createElement('button');
+        closeButton.type = 'button';
+        closeButton.className = 'close';
+        closeButton.dataset.dismiss = 'alert';
+        closeButton.innerHTML = '&times;';
+
+        alert.appendChild(closeButton);
+        messageContainer.appendChild(alert);
+
+        // 使用 setTimeout 来确保 DOM 元素已经被添加到页面中
+        // 然后再添加 'show' 类来开始动画
+        setTimeout(() => {
+            alert.classList.add('show');
+        }, 20);
+
+        setTimeout(() => {
+            $(alert).alert('close');
+        }, 3000);
+    }
+
+    // 在页面加载时也调用 updateData 函数
+    $(document).ready(updateData);
 </script>
 </body>
 </html>
