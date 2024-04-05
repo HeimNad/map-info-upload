@@ -43,25 +43,35 @@
     }
 </style>
 <body>
+<!-- 消息提示框 -->
+<div id="message-container" class="fixed-top m-3"
+style="left: auto; right: 0;top: 0; width: 300px; z-index: 9999;"></div>
 <div class="container">
     <h1 class="text-center my-4">地图信息补全</h1>
     <div class="form-group mb-3">
         <label for="map_name">地图名称</label>
         <input class="form-control mb-1" placeholder="e.g. 北极熊" id="map_name"/>
+        <label for="map_type">地图类型</label>
+        <select class="form-control mb-1" id="map_type">
+            <option value="单人">单人</option>
+            <option value="多人">多人</option>
+        </select>
         <label for="map_version">地图版本</label>
         <input class="form-control mb-1" placeholder="e.g. 1.16.5" id="map_version"/>
         <label for="map_url">地图链接</label>
         <input class="form-control mb-1" placeholder="e.g. https://example.com" id="map_url"/>
         <label for="url_code">提取码</label>
         <input class="form-control mb-1" placeholder="e.g. ZICB" id="url_code"/>
-        <label for="map_category">类型</label>
+        <label for="map_category">分类</label>
         <input class="form-control mb-1" placeholder="e.g. 冒险" id="map_category">
     </div>
     <div class="d-flex justify-content-center mb-5">
         <button class="btn btn-danger mx-3" onclick="clearInputs()">清空输入框</button>
         <button class="btn btn-primary mx-3" onclick="add()">插入</button>
     </div>
+    <!-- 表格 -->
     <div class="" id="table_div"></div>
+    <!-- 表格相关按钮 -->
     <div class="d-flex justify-content-center">
         <button class="btn btn-danger mx-3" onclick="clearTable()">清空表格</button>
         <button class="btn btn-success mx-3" onclick="submit()">提交</button>
@@ -113,6 +123,7 @@
     }
 
     const map_name = document.getElementById('map_name');
+    const map_type = document.getElementById('map_type');
     const map_version = document.getElementById('map_version');
     const map_url = document.getElementById('map_url');
     const url_code = document.getElementById('url_code');
@@ -122,36 +133,60 @@
 
     let map_info = [];
 
+    function showMessage(message, type) {
+        const messageContainer = document.getElementById('message-container');
+        const alert = document.createElement('div');
+        alert.className = `alert alert-${type} alert-dismissible fade show`;
+        alert.textContent = message;
+
+        const closeButton = document.createElement('button');
+        closeButton.type = 'button';
+        closeButton.className = 'close';
+        closeButton.dataset.dismiss = 'alert';
+        closeButton.innerHTML = '&times;';
+
+        alert.appendChild(closeButton);
+        messageContainer.appendChild(alert);
+
+        setTimeout(() => {
+            $(alert).alert('close');
+        }, 3000);
+    }
+
     function clearInputs() {
         map_name.value = '';
         map_version.value = '';
         map_url.value = '';
         url_code.value = '';
         map_category.value = '';
+        showMessage('输入框已清空', 'info');
     }
 
     function add() {
-        if (map_name.value === '' || map_version.value === '' || map_url.value === '' || url_code.value === '' || map_category.value === '') {
-            alert('输入框不能为空');
+        if (map_name.value === '' || map_version.value === '' || map_url.value === '' || url_code.value === '' || map_category.value === '' || map_type.value === '') {
+            showMessage('输入框不能为空', 'warning');
             return;
         }
 
         for (let i = 0; i < map_info.length; i++) {
             if (map_info[i].map_name === map_name.value) {
-                alert('地图名称重复');
+                showMessage('地图名称重复', 'warning');
                 return;
             }
         }
 
         map_info.push({
             map_name: map_name.value,
+            map_type: map_type.value,
             map_version: map_version.value,
             map_url: map_url.value,
             url_code: url_code.value,
-            map_category: map_category.value
+            map_category: map_category.value,
         });
 
         updateTable();
+
+        showMessage('添加成功', 'success');
     }
 
     function updateTable() {
@@ -160,7 +195,7 @@
         table.className = 'table table-striped table-bordered table-hover table-responsive-md';
 
         const thead = document.createElement('thead');
-        const headers = ['序号', '地图名称', '地图版本', '地图链接', '提取码', '类型', '操作'];
+        const headers = ['序号', '地图名称', '单双人', '地图版本', '地图链接', '提取码', '类型', '操作'];
         const headerRow = document.createElement('tr');
         headers.forEach(header => {
             const th = document.createElement('th');
@@ -190,6 +225,10 @@
             const cell = document.createElement('td');
             cell.textContent = info[key];
             cell.className = 'break-all';
+            cell.contentEditable = 'true';
+            cell.addEventListener('blur', function () {
+                map_info[index][key] = cell.textContent;
+            });
             row.appendChild(cell);
         }
 
@@ -224,7 +263,7 @@
 
     function submit() {
         if (map_info.length === 0) {
-            alert('表格为空，无法提交');
+            showMessage('表格为空，无法提交', 'warning');
             return;
         }
 
@@ -239,7 +278,7 @@
             return obj;
         });
 
-        fetch('http://127.0.0.1:5000/save_map_info', {
+        fetch('main.php', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
