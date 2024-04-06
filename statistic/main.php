@@ -30,6 +30,15 @@ $json_content = json_decode($file_content, true);
 // 计算内容项的总数
 $item_count = count($json_content);
 
+// 获取数组的最后一个元素
+$latest_map = end($json_content);
+
+// 获取最后一个元素的键
+$latest_map_name = key($json_content);
+
+// 将地图的名字和详细信息合并为一个新的数组
+$latest_map = [$latest_map_name => $latest_map];
+
 // 初始化单人地图和多人地图的计数器
 $single_map_count = 0;
 $multi_map_count = 0;
@@ -59,6 +68,7 @@ echo json_encode([
     'item_count' => $item_count,
     'single_map_count' => $single_map_count,
     'multi_map_count' => $multi_map_count,
-    'single_multi_map_count' => $single_multi_map_count
+    'single_multi_map_count' => $single_multi_map_count,
+    'latest_map' => $latest_map
 ]);
 ?>

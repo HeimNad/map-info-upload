@@ -2,6 +2,7 @@
 <html lang="zh_cn">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>熊熊地图补全计划</title>
     <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/4.6.2/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
@@ -123,6 +124,11 @@ style="left: auto; right: 0;top: 0; width: 300px; z-index: 9999;"></div>
     window.onload = function () {
         updateTable();
     }
+    window.onbeforeunload = function() {
+        if (map_info.length > 0) {
+            return "你的数据还没有提交，确定要离开吗？";
+        }
+    };
 
     const map_name = document.getElementById('map_name');
     const map_type = document.getElementById('map_type');
@@ -156,6 +162,12 @@ style="left: auto; right: 0;top: 0; width: 300px; z-index: 9999;"></div>
 
         setTimeout(() => {
             $(alert).alert('close');
+            // 添加过渡效果
+            alert.style.transition = "all 0.5s";
+            alert.style.transform = "translateY(-50px)";
+            setTimeout(() => {
+                alert.remove();
+            }, 500);
         }, 3000);
     }
 

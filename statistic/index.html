@@ -34,10 +34,11 @@
             <li class="list-group-item">单人地图数目: <span id="singleMapCount"></span></li>
             <li class="list-group-item">多人地图数目: <span id="multiMapCount"></span></li>
             <li class="list-group-item">单/多人地图数目: <span id="singleandmultiMapCount"></span></li>
+            <li class="list-group-item">最新上传地图: <span id="latestMap"></span></li>
         </ul>
     </div>
 </div>
-<div class="d-flex justify-content-center mt-5">
+<div class="d-flex justify-content-center mb-5 mt-3">
     <button id="refreshButton" class="btn btn-primary">刷新数据</button>
 </div>
 <script>
@@ -47,13 +48,47 @@
 
     function updateData() {
         $.get('main.php', function (data) {
+            // 文件信息
             $('#fileName').text(data.file_name);
             $('#fileSize').text(data.file_size);
+            $('#fileUpdateTime').text(data.file_update_time);
+            // 内容信息
             $('#itemCount').text(data.item_count);
             $('#singleMapCount').text(data.single_map_count);
             $('#multiMapCount').text(data.multi_map_count);
             $('#singleandmultiMapCount').text(data.single_multi_map_count);
-            $('#fileUpdateTime').text(data.file_update_time);
+
+            // 最新上传地图
+            let latestMapHtml = '<ul>';
+            for (let mapName in data.latest_map) {
+                latestMapHtml += '<li><strong>地图名: ' + mapName + '</strong></li>';
+                let mapDetails = data.latest_map[mapName];
+                for (let key in mapDetails) {
+                    let translatedKey;
+                    switch (key) {
+                        case 'url':
+                            translatedKey = '链接';
+                            break;
+                        case 'version':
+                            translatedKey = '版本';
+                            break;
+                        case 'code':
+                            translatedKey = '提取码';
+                            break;
+                        case 'category':
+                            translatedKey = '类别';
+                            break;
+                        case 'type':
+                            translatedKey = '类型[单(1)/双人(2)/单双人(3)]';
+                            break;
+                        default:
+                            translatedKey = key;
+                    }
+                    latestMapHtml += '<li style="margin-left: 20px;">' + translatedKey + ': ' + mapDetails[key] + '</li>';
+                }
+            }
+            latestMapHtml += '</ul>';
+            $('#latestMap').html(latestMapHtml);
 
             showMessage('刷新成功', 'success');
         }, 'json');
