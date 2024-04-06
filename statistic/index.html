@@ -2,6 +2,7 @@
 <html lang="zh_cn">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>已上传统计</title>
     <link href="https://cdn.bootcdn.net/ajax/libs/twitter-bootstrap/4.6.2/css/bootstrap.min.css" rel="stylesheet"
           integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
@@ -54,7 +55,6 @@
             $('#singleandmultiMapCount').text(data.single_multi_map_count);
             $('#fileUpdateTime').text(data.file_update_time);
 
-            // 显示消息
             showMessage('刷新成功', 'success');
         }, 'json');
     }
@@ -74,18 +74,20 @@
         alert.appendChild(closeButton);
         messageContainer.appendChild(alert);
 
-        // 使用 setTimeout 来确保 DOM 元素已经被添加到页面中
-        // 然后再添加 'show' 类来开始动画
         setTimeout(() => {
             alert.classList.add('show');
         }, 20);
 
         setTimeout(() => {
             $(alert).alert('close');
+            alert.style.transition = "all 0.5s";
+            alert.style.transform = "translateY(-50px)";
+            setTimeout(() => {
+                alert.remove();
+            }, 500);
         }, 3000);
     }
 
-    // 在页面加载时也调用 updateData 函数
     $(document).ready(updateData);
 </script>
 </body>
